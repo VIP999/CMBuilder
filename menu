@@ -1,0 +1,87 @@
+#!/bin/bash
+. scripts/functions
+
+clear
+
+TOOL_Name="CMBuilder"
+TOOL_Version="ALPHA"
+
+DIR_List="scripts"
+
+ERROR_Missing=0
+
+for i in $DIR_List
+do
+	if [ ! -d $i ]; then
+		echo -e "${COLOR_Red}ERROR${COLOR_Wipe}: Folder $i not found."
+		ERROR_Missing=1
+	fi
+done
+
+if [ ! -f scripts/init_tool ]; then
+		echo -e "${COLOR_Red}ERROR${COLOR_Wipe}: File scripts/init_tool not found."
+		ERROR_Missing=1
+fi
+
+if [ $ERROR_Missing == 1 ]; then
+	echo -e "\nPlease install RomCompiler correctly\n\n"
+fi
+
+chmod -R 777 scripts/*
+scripts/init_tool
+INIT_Return=$?
+
+if [ $INIT_Return == 1 ]; then 
+	exit
+fi
+
+
+while :
+do
+
+  clear
+
+  echo 
+	clear
+	echo -e "\n ==============================================================="
+	echo -e " ${COLOR_Blue}$TOOL_Name $TOOL_Version${COLOR_Wipe} # by GalaxyUser [${COLOR_Yellow}xda-developers.com${COLOR_Wipe}]"
+	echo -e " ===============================================================e"
+	echo "    -> [MAIN MENU]"
+	echo
+	echo "    1) Sync/Build CyanogenMod sources"
+	echo "    2) Install SDK, SDK build-tools and SDK platform tools"
+	echo "    3) Install build-dependecies"
+	echo "    4) Check system status"
+	echo
+	echo "    u) $TOOL_Name Update"
+	echo "    e) Exit"
+	echo
+	echo -n " Enter option: "
+	
+	read choice
+
+		case $choice in
+		
+		1 ) scripts/menu_cyanogen $TOOL_Name $TOOL_Version
+			;;
+			
+		2 ) scripts/install_sdk
+			;;
+			
+		3 ) scripts/install_dependencies
+			;;
+			
+		4 ) scripts/check_system
+			;;
+		
+		[Uu]* ) scripts/check_version
+			;;
+		
+		[Ee]* )
+			exit 1
+			;;
+		
+		* ) ;;
+		esac
+
+done
