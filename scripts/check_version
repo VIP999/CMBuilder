@@ -1,0 +1,57 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+version=0.1
+
+echo -n -e "\n Checking for update... "
+wget -q --no-check-certificate "https://github.com/GalaxyUser/CMBuilder/raw/master/version" -O version
+
+if [ -f version ] && [ $(F_SizeOf version) > 0 ]; then
+	echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+	LatestVersion=$(cat version)
+	LatestFile=CMBuilder_$LatestVersion.zip
+	rm -f version
+	echo
+else
+	echo -e "${COLOR_RED}ERROR${COLOR_Wipe}"
+	echo
+	F_PressEnter
+	exit 0
+fi
+
+if [ ! $LatestVersion == $version ]; then
+	echo -n -e " Your version of ${COLOR_Cyan}CMBuilder${COLOR_Wipe} is outdated. A newer version is available.
+	Download ? [Recommended]
+	(Y)es, (N)o: "
+
+	read -p "" choice
+
+	case $choice in	
+		[Yy]* ) 
+			F_PleaseWait
+			echo -n -e "\n Downloading latest version... "
+			wget -q --no-check-certificate "https://github.com/GalaxyUser/CMBuilder/raw/master/version" -O $LatestFile
+			
+			if [ -f $LatestFile ] && [ $(F_SizeOf $LatestFile) > 0 ]; then
+				echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+				echo -e "\n Please extract this file to use new version of CMCompiler:"
+				echo -e " ${COLOR_Yellow}$LatestFile${COLOR_Wipe}"
+				
+			else
+				echo -e "${COLOR_RED}ERROR${COLOR_Wipe}"
+			fi
+			;;
+			
+		* )
+			exit 0
+			;;
+	esac
+else
+	echo -e " ${COLOR_Green}You already have the latest version.${COLOR_Wipe}"
+fi
+
+echo
+F_PressEnter
+
+

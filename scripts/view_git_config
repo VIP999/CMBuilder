@@ -1,0 +1,11 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+echo -e "\n ${COLOR_Blue}Git config:"
+echo -e " -----------${COLOR_Wipe}\n"
+git config --list | echo " $(grep -i "user.name=")"
+git config --list | echo " $(grep -i "user.email=")"
+
+echo
+F_PressEnter

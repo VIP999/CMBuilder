@@ -1,0 +1,36 @@
+#!/bin/bash
+. scripts/functions
+
+git config --list | grep -q -i 'user.name'
+
+if [ ! $? == 0 ]; then
+	echo -e -n "\n\n It seems that ${COLOR_Cyan}Git${COLOR_Wipe} is not configured
+	Configure ? [Recommended]
+	(Y)es, (N)o: "
+	
+	read -p "" choice
+	
+		case $choice in
+		
+		[Yy]* )	
+			echo -e -n "\n Your username: "
+			read username
+			git config --global user.name $username
+			
+			echo -n " Your email: "
+			read email
+			git config --global user.email $email
+			
+			echo -e -n "\n Git ${COLOR_Green}properly${COLOR_Wipe} configured"
+			exit 0
+				
+			;;
+		
+		* )
+			exit 1
+			;;
+		esac
+		
+fi
+
+exit 2

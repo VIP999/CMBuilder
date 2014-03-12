@@ -1,0 +1,82 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+# Check if script has root permissions
+
+F_CheckSU
+
+echo -n "Iniatialization..."
+
+F_GetArch
+
+echo -n ".."
+
+# Check for script dependencies
+
+TOOL_DEPENDENCIES="wget tar unzip sed"
+
+for package in $TOOL_DEPENDENCIES
+do
+	if ! dpkg -s "$package" 2>/dev/null | grep -q -i "install ok installed"; then
+		echo -e -n  "${COLOR_Yellow}$package$COLOR_Wipe is required to run this tool.
+	Install ?
+	(Y)es, (N)o: " 
+	
+	read -p "" choice
+	
+		case $choice in
+		
+		[Yy]* )
+			echo -n -e "\nInstalling $package... "
+			sudo apt-get -y install wget 2>/dev/null 1>/dev/null
+			;;
+		
+		[Nn]* )
+			echo -e "\nPlease install $package manually"
+			exit 1
+			;;
+		
+		* )
+			echo -e "\nWrong value... Exiting"
+			exit 1
+			;;
+		esac
+		
+		
+		if dpkg -s "$package" 2>/dev/null 1>/dev/null; then
+			echo -e "${COLOR_Green}OK${COLOR_Wipe}\n"
+		else
+			echo -e "${COLOR_Red}ERROR${COLOR_Wipe}"
+			echo "Please check your internet connection"
+		fi
+	fi
+	echo -n ".."
+done
+
+# Check amount of ram
+if [ $(grep -i Memtotal /proc/meminfo|awk '{print $2}') -le 3200000 ]; then
+	echo -e "\nAvailable RAM... ${COLOR_Red}ERROR${COLOR_Wipe}"
+	echo "Amout of RAM too low < 4 Go"
+	echo "${COLOR_Red}4 Go of RAM are needed for compiling android${COLOR_Wipe}"
+fi
+
+echo -n ".."
+
+# Check if running system is Ubuntu
+if ! uname -v|grep -q -i Ubuntu; then
+	echo -e "${COLOR_Red}ERROR${COLOR_Wipe}: running system is not ${COLOR_Blue}Ubuntu${COLOR_Wipe}"
+	echo "${COLOR_Red}This script was not written to run on your system, it will probably not work.{COLOR_Wipe}"
+fi
+
+echo ".."
+
+# Check system arch
+if [ $(F_GetArch) == 64 ]; then
+	exit 2
+else
+	echo "${COLOR_Red}A 64-bit version of Ubuntu is necessary to compile the latest version of android (> 2.3)${COLOR_Wipe}"
+fi
+
+F_PressEnter
+exit 2

@@ -1,0 +1,25 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+echo -e "\n Current device: ${COLOR_Cyan}$(sed -n "1 p" scripts/config_tool)${COLOR_Wipe}"
+echo -e -n "\n Please enter the new device name: "
+read DEVICE_Name
+DEVICE_Old=$(sed -n "1 p" scripts/config_tool)
+
+if [[ ! $DEVICE_Old == $DEVICE_Name ]]; then
+	scripts/get_compatibles_devices $DEVICE_Name
+	GET_ERROR=$?
+	if [ $GET_ERROR == 0 ]; then
+		echo -e " Changed from ${COLOR_Cyan}$DEVICE_Old${COLOR_Wipe} to ${COLOR_Cyan}$DEVICE_Name${COLOR_Wipe}"
+		sed -i "1c$DEVICE_Name" scripts/config_tool
+	else 
+		F_PressEnter
+		exit
+	fi
+else
+	echo -e " Nothing to change."
+fi
+
+echo
+F_PressEnter

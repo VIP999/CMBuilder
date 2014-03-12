@@ -1,0 +1,45 @@
+#!/bin/bash
+. scripts/functions
+
+if [ ! -f ~/bin/repo ]; then
+	echo -e -n  "\n The ${COLOR_Yellow}repo${COLOR_Wipe} command does not seem installed. 
+	Install ? [Recommended]
+	(Y)es, (N)o: "
+		
+	read -p "" choice
+
+	case $choice in	
+		[Yy]* ) 
+			echo -n -e "\n Installing repo... "
+
+			mkdir -p ~/bin
+			curl -s http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+			chmod a+x ~/bin/repo
+
+			if ! grep -q -i "export PATH=" ~/.bashrc; then
+				echo >> ~/.bashrc
+				echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
+			elif ! grep -q -i "=~/bin" ~/.bashrc && ! grep -q -i "~/bin:" ~/.bashrc  && ! grep -q -i ":~/bin" ~/.bashrc; then
+				var=$(grep -i "export PATH=" ~/.bashrc)
+				sed -i '/export PATH=/d' ~/.bashrc
+				echo $var':~/bin' >> ~/.bashrc
+			fi
+
+			if [ -f ~/bin/repo ]; then
+				echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+			else
+				echo -e "${COLOR_Red}ERROR${COLOR_Wipe}"
+			fi
+
+			source ~/.bashrc
+			;;
+				
+		[Nn]* )
+			echo -e " Repo installation... ${COLOR_Cyan}Ignored${COLOR_Wipe}"
+			;;
+				
+		* )
+			echo -e " Wrong value... ${COLOR_Cyan}Ignored${COLOR_Wipe}"
+			;;
+	esac
+fi

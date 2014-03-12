@@ -1,0 +1,87 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+F_PleaseWait
+
+echo -e -n "\n Install the correct ${COLOR_Yellow}java${COLOR_Wipe} version ? [Recommended]
+	(Y)es, (N)o: "
+
+read -p "" choice
+
+case $choice in	
+	[Yy]* ) 
+		echo -n -e " Removing wrong java installation... "
+		sudo apt-get -y purge openjdk-\* icedtea-\* icedtea6-\* 2>/dev/null 1>/dev/null
+		sudo add-apt-repository -y ppa:webupd8team/java 2>/dev/null 1>/dev/null
+		sudo apt-get -y update 2>/dev/null 1>/dev/null
+		echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+		;;
+		
+	[Nn]* )
+		echo -e " Java installation... ${COLOR_Cyan}Ignored${COLOR_Wipe}"
+		;;
+		
+	* )
+		echo -e " Wrong value... ${COLOR_Cyan}Ignored${COLOR_Wipe}"
+		;;
+esac
+
+# Configure Repo
+scripts/install_repo
+
+# Dependencies
+echo -e -n "\n Installing dependencies... "
+
+# Prevent apt errors
+sudo killall apt-get 2>/dev/null 1>/dev/null
+sudo rm /var/lib/dpkg/lock 2>/dev/null 1>/dev/null
+sudo dpkg --configure -a 2>/dev/null 1>/dev/null
+
+BUILD_DEPENDENCIES="oracle-java6-installer git git-core lzop ccache gnupg flex bison gperf build-essential zip curl zlib1g-dev zlib1g-dev:i386 libc6-dev lib32ncurses5 lib32z1 lib32bz2-1.0 lib32ncurses5-dev x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 lib32z1-dev libgl1-mesa-glx:i386 libgl1-mesa-dev g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc readline-common libreadline6-dev libreadline6 lib32readline-gplv2-dev libncurses5-dev lib32readline5 lib32readline6 libreadline-dev libreadline6-dev:i386 libreadline6:i386 bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev lib32bz2-dev libsdl1.2-dev libesd0-dev squashfs-tools pngcrush schedtool libwxgtk2.8-dev python gcc g++ cpp gcc-4.8 g++-4.8"
+
+if [ $(df $(pwd) | awk '/[0-9]%/{print $(NF-2)}') -le 2000000 ]; then
+	echo -e "${COLOR_Red}ERROR${COLOR_Wipe}\n"
+	echo -e " Please free up disk space..."
+	F_PressEnter
+	exit
+fi
+
+ERROR_DEPENDENCIES=0
+MISSING_DEPENDENCIES=0
+
+for package in $BUILD_DEPENDENCIES
+do
+	if ! dpkg -s "$package" 2>/dev/null | grep -q -i "install ok installed"; then
+		((MISSING_DEPENDENCIES++))
+		echo -n -e "\n   $package... "
+		sudo apt-get -y install $package 2>/dev/null 1>/dev/null
+		
+		if ! dpkg -s "$package" 2>/dev/null | grep -q -i "install ok installed"; then
+			echo -e -n "${COLOR_Red}ERROR${COLOR_Wipe}"
+			ERROR_DEPENDENCIES=1
+		else
+			echo -e -n "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+		fi
+
+	fi
+done
+
+sudo ln -s /usr/lib/i386-linux-gnu/mesa/libGL.so.1 /usr/lib/i386-linux-gnu/libGL.so 2>/dev/null 1>/dev/null
+
+# Configure Git
+
+scripts/config_git
+if [ $? == 0 ]; then ((MISSING_DEPENDENCIES++)); fi
+
+if [ $ERROR_DEPENDENCIES -eq 0 ] && [ $MISSING_DEPENDENCIES -gt 0 ]; then
+	echo -e "\n\n The installation of dependencies was successful."
+elif [ $MISSING_DEPENDENCIES -eq 0 ]; then
+	echo -e "${COLOR_Yellow} ALREADY INSTALLED${COLOR_Wipe}"
+else
+	echo -e "\n\n There were one or more errors during the installation of dependencies."
+fi
+
+echo
+
+F_PressEnter

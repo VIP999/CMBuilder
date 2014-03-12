@@ -1,0 +1,30 @@
+#!/bin/bash
+. scripts/functions
+
+echo -e -n "\n Checking for compatibles devices... "
+
+if [[ $1 == "" ]]; then
+	echo -e "\n ${COLOR_Red}ERROR${COLOR_Wipe}: no device specified\n"
+	exit '3'
+fi
+
+wget -q "http://download.cyanogenmod.org/" -O compatibles_devices
+
+if [ -f compatibles_devices ] && [ $(F_SizeOf compatibles_devices) == 0 ]; then
+	echo -e "${COLOR_Red}ERROR${COLOR_Wipe}"
+	echo -e " Cannot access download.cyanogenmod.org\n"
+	exit 2
+fi
+
+cat compatibles_devices | grep -i '"device_' | awk -F'>' '{print $4}' | awk -F'<' '{print $1}' | grep -q $1
+
+if [ $? == 0 ]; then
+	echo -e "${COLOR_Green}COMPATIBLE${COLOR_Wipe}"
+	DEVICE_Compatible=0
+else
+	echo -e "${COLOR_Red}INCOMPATIBLE${COLOR_Wipe}\n"
+	echo -e " ${COLOR_Red}ERROR${COLOR_Wipe}: Your device is not compatible with official cyanogen.\n"
+	DEVICE_Compatible=1
+fi
+
+exit $DEVICE_Compatible

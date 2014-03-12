@@ -1,0 +1,78 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+PATH_Old=$(sed -n "3 p" scripts/config_tool)
+echo -e "\n Current path: ${COLOR_Cyan}$PATH_Old${COLOR_Wipe}"
+
+if [ ! -d $PATH_Old ]; then
+	echo -e -n "\n ${COLOR_Red}WARNING${COLOR_Wipe}: Current path folder does not exist
+	Create ?
+	(Y)es, (N)o: "
+	read choice
+		
+	case $choice in
+		[Yy]* )
+			mkdir $PATH_Old 2>/dev/null
+			if [ -d $PATH_Old ]; then
+				chmod 777 $PATH_Old
+				echo -e "\n\n SUCCESS: ${COLOR_Green}$PATH${COLOR_Wipe}_Old was created"
+			else
+				echo -e "\n\n ${COLOR_Red}ERROR${COLOR_Wipe}: Can't create folder $PATH_Old"
+			fi
+			
+			echo
+			F_PressEnter
+			exit 0
+			;;
+		* ) 
+		;;
+	esac
+fi
+echo -e -n "\n Please enter the new repo path: "
+read REPO_Path
+
+if [[ $REPO_Path == "" ]]; then
+	echo -e "\n ${COLOR_Red}ERROR${COLOR_Wipe}: no path specified\n"
+	F_PressEnter
+	exit 1
+fi
+
+if [[ ! $PATH_Old == $REPO_Path ]] && [[ ! $REPO_Path == "scripts" ]]; then
+	if [ -d $REPO_Path ]; then
+		echo -e "\n Changed from ${COLOR_Cyan}$PATH_Old${COLOR_Wipe} to ${COLOR_Cyan}$REPO_Path${COLOR_Wipe}"
+		sed -i "3c$REPO_Path" scripts/config_tool
+	else
+		echo -e -n "\n ${COLOR_Yellow}INFORMATION${COLOR_Wipe}: This path does not exist, create it ?
+		(Y)es, (N)o: "
+		read choice
+		
+		case $choice in
+			[Yy]* )
+				mkdir $REPO_Path 2>/dev/null
+				if [ -d $REPO_Path ]; then
+					chmod 777 $REPO_Path
+					echo -e "\n Changed from ${COLOR_Cyan}$PATH_Old${COLOR_Wipe} to ${COLOR_Cyan}$REPO_Path${COLOR_Wipe}"
+					sed -i "3c$REPO_Path" scripts/config_tool
+				else
+					echo -e "\n ${COLOR_Red}ERROR${COLOR_Wipe}: Can't create folder ${COLOR_Cyan}$REPO_Path${COLOR_Wipe}"
+				fi
+				;;
+				
+			* ) 
+			echo -e -n "\n ${COLOR_Yellow}INFORMATION${COLOR_Wipe}: Change repo path canceled"
+			;;
+		esac
+			
+		echo
+		F_PressEnter
+		exit 0
+	fi
+else
+	echo -e " Nothing to change."
+fi
+
+echo
+F_PressEnter
+
+

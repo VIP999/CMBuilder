@@ -1,0 +1,81 @@
+#!/bin/bash
+. scripts/functions
+clear
+
+BUILD_DEPENDENCIES="oracle-java6-installer git-core lzop ccache gnupg flex bison gperf build-essential zip curl zlib1g-dev zlib1g-dev:i386 libc6-dev lib32ncurses5 lib32z1 lib32bz2-1.0 lib32ncurses5-dev x11proto-core-dev libx11-dev:i386 libreadline6-dev:i386 lib32z1-dev libgl1-mesa-glx:i386 libgl1-mesa-dev g++-multilib mingw32 tofrodos python-markdown libxml2-utils xsltproc readline-common libreadline6-dev libreadline6 lib32readline-gplv2-dev libncurses5-dev lib32readline5 lib32readline6 libreadline-dev libreadline6-dev:i386 libreadline6:i386 bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev lib32bz2-dev libsdl1.2-dev libesd0-dev squashfs-tools pngcrush schedtool libwxgtk2.8-dev python gcc g++ cpp gcc-4.8 g++-4.8"
+
+
+# System version
+
+if uname -v|grep -q -i Ubuntu; then
+	echo -e -n "\n\n OS: ${COLOR_Blue}Ubuntu${COLOR_Wipe}"
+else
+	echo -e -n "\n\n OS: ${COLOR_Red}$(uname -v)${COLOR_Wipe}"
+fi
+
+# Arch
+
+if [ $(F_GetArch) == 64 ]; then
+	echo -e " ${COLOR_Green}x64${COLOR_Wipe}"
+else
+	echo -e " ${COLOR_Red}x86${COLOR_Wipe}"
+fi
+
+echo
+
+# Check amount of ram
+RAM=$(grep -i Memtotal /proc/meminfo|awk '{print $2}')
+if [ $RAM -ge 3200000 ]; then
+	echo -e " RAM: ${COLOR_Green}OK${COLOR_Wipe}"
+else
+	echo -e " RAM: ${COLOR_Red}< 3.2Go${COLOR_Wipe}"
+fi
+
+# SDK is installed
+
+if [ -d "android-sdk-linux" ]; then
+	echo -e " Installed SDK: ${COLOR_Green}YES${COLOR_Wipe}"
+else
+	echo -e " Installed SDK: ${COLOR_Red}NO${COLOR_Wipe}"
+fi
+
+if [ -d "android-sdk-linux/build-tools" ]; then
+	echo -e " Installed SDK build-tools: ${COLOR_Green}YES${COLOR_Wipe}"
+else
+	echo -e " Installed SDK build-tools: ${COLOR_Red}NO${COLOR_Wipe}"
+fi
+
+if [ -d "android-sdk-linux/platform-tools" ]; then
+	echo -e " Installed SDK platform-tools: ${COLOR_Green}YES${COLOR_Wipe}"
+else
+	echo -e " Installed SDK platform-tools: ${COLOR_Red}NO${COLOR_Wipe}"
+fi
+
+# Check for dependencies
+INSTALLED_DEPENDENCIES=0
+NUMBER_DEPENDENCIES=0
+for package in $BUILD_DEPENDENCIES
+do
+	((NUMBER_DEPENDENCIES++))
+	if dpkg -s "$package" 2>/dev/null | grep -q -i "install ok installed"; then
+		((INSTALLED_DEPENDENCIES++))
+	fi
+done
+
+if [ $INSTALLED_DEPENDENCIES == $NUMBER_DEPENDENCIES ]; then
+	echo -e " Installed dependencies: [${COLOR_Green}$INSTALLED_DEPENDENCIES${COLOR_Wipe}/$NUMBER_DEPENDENCIES]"
+else
+	echo -e " Installed dependencies: [${COLOR_Red}$INSTALLED_DEPENDENCIES${COLOR_Wipe}/$NUMBER_DEPENDENCIES]"
+fi
+
+
+# Repo
+
+if [ -f ~/bin/repo ]; then
+	echo -e " Installed repo command: ${COLOR_Green}YES${COLOR_Wipe}"
+else
+	echo -e " Installed repo command: ${COLOR_Red}NO${COLOR_Wipe}"
+fi
+
+echo
+F_PressEnter

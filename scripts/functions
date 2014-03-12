@@ -1,0 +1,68 @@
+#!/bin/bash	
+
+# Variables
+
+COLOR_Wipe='\033[1m\033[0m'
+COLOR_Green='\e[1;32m'
+COLOR_Red='\e[1;31m'
+COLOR_Yellow='\e[1;33m'
+COLOR_Blue='\e[1;34m'
+COLOR_Cyan='\e[1;36m'
+
+# Check SU
+F_CheckSU() {
+	if [ $EUID -ne 0 ]; then
+		echo "\n This script must be run as root"
+		exit 1
+	fi
+}
+
+# Please wait function
+F_PleaseWait() {
+	echo -e "\n Please wait, this can take a while"
+}
+
+# Enter any key to continue
+F_PressEnter() {
+	read -p " Press Enter to continue"
+}
+
+# System Arch
+F_GetArch() {
+	if uname -a|grep -q -i x86_64; then
+		echo 64
+	else
+		echo 86
+	fi
+}
+
+# Return size of a file in bytes
+F_SizeOf() {
+	echo $(du -b $1 | sed 's/\([0-9]*\)\(.*\)/\1/')
+}
+
+# Download function with download bytes
+F_Download() {
+	ZIPNAME=$1
+	LINK=$2
+	NAME=$3
+	
+	if [ ! -f $ZIPNAME ]; then
+		echo
+		SDK_SIZE=$(curl -sI $LINK | grep Content-Length | awk '{print $2}')
+		
+		wget -q -b $LINK 2>/dev/null 1>/dev/null
+		
+		while ps -ef | grep wget | grep -i $ZIPNAME 2>/dev/null 1>/dev/null; do
+			if [ -f $ZIPNAME ]; then
+				echo -n -e " Downloading ${COLOR_Yellow}$NAME${COLOR_Wipe}... $(F_SizeOf $ZIPNAME)/$SDK_SIZE"
+			fi
+		done
+		
+		if [ ! -f $ZIPNAME ] || [[ -f $ZIPNAME && $(F_SizeOf $ZIPNAME) == 0 ]]; then
+			echo -e "\n ${COLOR_Red}Error when downloading $NAME.${COLOR_Wipe}\n"
+			F_PressEnter
+			exit
+		fi
+	fi
+}
