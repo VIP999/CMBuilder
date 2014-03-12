@@ -2,24 +2,28 @@
 . scripts/functions
 clear
 
-echo
-echo -e " Device: ${COLOR_Yellow}empty${COLOR_Wipe} | Branch: ${COLOR_Yellow}empty${COLOR_Wipe}"
-echo -e " Repo path: ${COLOR_Yellow}empty${COLOR_Wipe}"
-
 
 
 while :
 do
-
-  clear
-
-
-  echo 
+	DEVICE_Name=$(sed -n "1 p" scripts/config_tool)
+	if [[ $DEVICE_Name == "" ]]; then DEVICE_Name="empty"; fi
+	
+	REPO_Branch=$(sed -n "2 p" scripts/config_tool)
+	if [[ $REPO_Branch == "" ]]; then REPO_Branch="empty"; fi
+	
+	REPO_Path=$(sed -n "3 p" scripts/config_tool)
+	if [[ $REPO_Path == "" ]]; then REPO_Path="empty"; fi
+	
 	clear
 	echo -e "\n ==============================================================="
 	echo -e " ${COLOR_Blue}$1 $2${COLOR_Wipe} # by GalaxyUser [${COLOR_Yellow}xda-developers.com${COLOR_Wipe}]"
 	echo -e " ==============================================================="
 	echo "    -> [Sync/Build CyanogenMod sources]"
+	echo
+	echo -e "    ${COLOR_Green}[Device]${COLOR_Wipe} $DEVICE_Name"
+	echo -e "    ${COLOR_Green}[Branch]${COLOR_Wipe} $REPO_Branch"
+	echo -e "    ${COLOR_Green}[Repo Path]${COLOR_Wipe} $REPO_Path"
 	echo
 	echo "    1) Change Repo path"
 	echo "    2) Change branch"
