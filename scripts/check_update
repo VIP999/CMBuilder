@@ -5,7 +5,7 @@ clear
 version=0.1
 
 echo -n -e "\n Checking for update... "
-wget -q --no-check-certificate "https://github.com/GalaxyUser/CMBuilder/raw/master/version" -O version
+wget -q --no-check-certificate "https://github.com/GalaxyUser/CMBuilder/raw/master/version"
 
 if [ -f version ] && [ $(F_SizeOf version) > 0 ]; then
 	echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"

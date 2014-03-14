@@ -74,7 +74,7 @@ do
 		4 ) scripts/check_system
 			;;
 		
-		[Uu]* ) scripts/check_version
+		[Uu]* ) scripts/check_update
 			;;
 		
 		[Ee]* )

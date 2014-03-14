@@ -13,8 +13,20 @@ if [ ! -f ~/bin/repo ]; then
 			echo -n -e "\n Installing repo... "
 
 			mkdir -p ~/bin
-			curl -s http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-			chmod a+x ~/bin/repo
+			wget -q "http://commondatastorage.googleapis.com/git-repo-downloads/repo"
+			
+			if [ -f repo ] && [ $(F_SizeOf repo) > 0 ]; then
+			
+				mv repo ~/bin/repo
+				chmod a+x ~/bin/repo
+				echo -e " ${COLOR_Green}SUCCESS${COLOR_Wipe}"
+				echo
+			else
+				echo -e " ${COLOR_RED}ERROR${COLOR_Wipe}"
+				echo -e " Cannot download repo file\n"
+				F_PressEnter
+				exit 0
+			fi
 
 			if ! grep -q -i "export PATH=" ~/.bashrc; then
 				echo >> ~/.bashrc
