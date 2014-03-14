@@ -1,4 +1,4 @@
 CMBuilder
 =========
 
-CyanogenMod environment installer &amp; CyanogenMod compiler
+CyanogenMod environment installer and CyanogenMod compiler
