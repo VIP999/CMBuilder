@@ -13,7 +13,7 @@ if [ $GIT_CONFIG_NAME == 1 ] || [ $GIT_CONFIG_EMAIL == 1 ]; then
 	Configure ? [Recommended]
 	(Y)es, (N)o: "
 	
-	read -p "" choice
+	read choice
 	
 		case $choice in
 		

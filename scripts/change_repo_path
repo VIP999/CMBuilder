@@ -29,6 +29,7 @@ if [ ! -d $PATH_Old ]; then
 		;;
 	esac
 fi
+
 echo -e -n "\n Please enter the new repo path: "
 read REPO_Path
 
@@ -74,5 +75,3 @@ fi
 
 echo
 F_PressEnter
-
-

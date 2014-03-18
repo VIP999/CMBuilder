@@ -6,7 +6,7 @@ if [ ! -f ~/bin/repo ]; then
 	Install ? [Recommended]
 	(Y)es, (N)o: "
 		
-	read -p "" choice
+	read choice
 
 	case $choice in	
 		[Yy]* ) 
