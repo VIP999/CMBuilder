@@ -15,43 +15,53 @@ if [ ! -f ~/bin/repo ]; then
 			mkdir -p ~/bin
 			wget -q "http://commondatastorage.googleapis.com/git-repo-downloads/repo"
 			
-			if [ -f repo ] && [ $(F_SizeOf repo) > 0 ]; then
+			if [ -f repo ] && [ $(F_SizeOf repo) -gt 0 ]; then
 			
 				mv repo ~/bin/repo
 				chmod a+x ~/bin/repo
-				echo -e " ${COLOR_Green}SUCCESS${COLOR_Wipe}"
-				echo
+			
+				if [ -f ~/bin/repo ]; then
+					echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+
+					if [ ! -f ~/.bashrc ]; then
+						echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
+					else
+						if ! grep -q -i "export PATH=" ~/.bashrc; then
+							echo >> ~/.bashrc
+							echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
+						elif ! grep -q -i "=~/bin" ~/.bashrc && ! grep -q -i "~/bin:" ~/.bashrc  && ! grep -q -i ":~/bin" ~/.bashrc; then
+							var=$(grep -i "export PATH=" ~/.bashrc)
+							sed -i '/export PATH=/d' ~/.bashrc
+							echo $var':~/bin' >> ~/.bashrc
+						fi
+					fi
+					source ~/.bashrc
+				else
+					echo -e "${COLOR_Red}ERROR${COLOR_Wipe}"
+					rm -f repo 2>/dev/null
+					F_PressEnter
+					exit 1
+				fi
 			else
 				echo -e " ${COLOR_RED}ERROR${COLOR_Wipe}"
 				echo -e " Cannot download repo file\n"
+				rm -f repo
 				F_PressEnter
-				exit 0
+				exit 1
 			fi
-
-			if ! grep -q -i "export PATH=" ~/.bashrc; then
-				echo >> ~/.bashrc
-				echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
-			elif ! grep -q -i "=~/bin" ~/.bashrc && ! grep -q -i "~/bin:" ~/.bashrc  && ! grep -q -i ":~/bin" ~/.bashrc; then
-				var=$(grep -i "export PATH=" ~/.bashrc)
-				sed -i '/export PATH=/d' ~/.bashrc
-				echo $var':~/bin' >> ~/.bashrc
-			fi
-
-			if [ -f ~/bin/repo ]; then
-				echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
-			else
-				echo -e "${COLOR_Red}ERROR${COLOR_Wipe}"
-			fi
-
-			source ~/.bashrc
 			;;
 				
 		[Nn]* )
 			echo -e " Repo installation... ${COLOR_Cyan}Ignored${COLOR_Wipe}"
+			exit 2
 			;;
 				
 		* )
 			echo -e " Wrong value... ${COLOR_Cyan}Ignored${COLOR_Wipe}"
+			exit 2
 			;;
 	esac
+else
+	exit 4
 fi
+exit 0
