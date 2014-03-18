@@ -2,10 +2,22 @@
 . scripts/functions
 clear
 
+GIT_Configured=0
+
 echo -e "\n ${COLOR_Blue}Git config:"
-echo -e " -----------${COLOR_Wipe}\n"
+echo -e " -----------${COLOR_Wipe}"
 git config --list | echo " $(grep -i "user.name=")"
+if [ ! $? == 0 ]; then
+	echo -e " ${COLOR_Yellow}user.name${COLOR_Wipe} is not configured"
+	((GIT_Configured++))	
+fi
 git config --list | echo " $(grep -i "user.email=")"
+if [ ! $? == 0 ]; then
+	echo -e " ${COLOR_Yellow}user.email${COLOR_Wipe} is not configured"
+	((GIT_Configured++))
+fi
+
+scripts/config_git
 
 echo
 F_PressEnter
