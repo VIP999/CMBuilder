@@ -2,6 +2,8 @@
 . scripts/functions
 clear
 
+ERROR_DEPENDENCIES=0
+MISSING_DEPENDENCIES=0
 F_PleaseWait
 
 echo -e -n "\n Install the correct ${COLOR_Yellow}java${COLOR_Wipe} version ? [Recommended]
@@ -13,8 +15,6 @@ case $choice in
 	[Yy]* ) 
 		echo -n -e " Removing wrong java installation... "
 		sudo apt-get -y purge openjdk-\* icedtea-\* icedtea6-\* 2>/dev/null 1>/dev/null
-		sudo add-apt-repository -y ppa:webupd8team/java 2>/dev/null 1>/dev/null
-		sudo apt-get -y update 2>/dev/null 1>/dev/null
 		echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
 		;;
 		
@@ -29,6 +29,12 @@ esac
 
 # Configure Repo
 scripts/install_repo
+REPO_RETURN=$?
+if [ $REPO_RETURN == 1 ]; then
+	ERROR_DEPENDENCIES=1
+elif [ $REPO_RETURN == 0 ]; then
+	((MISSING_DEPENDENCIES++))
+fi
 
 # Dependencies
 echo -e -n "\n Installing dependencies... "
@@ -50,17 +56,16 @@ if [ $(df $(pwd) | awk '/[0-9]%/{print $(NF-2)}') -le 2000000 ]; then
 	exit
 fi
 
-ERROR_DEPENDENCIES=0
-MISSING_DEPENDENCIES=0
-
 for package in $BUILD_DEPENDENCIES
 do
 	if ! dpkg -s "$package" 2>/dev/null | grep -q -i "install ok installed"; then
 		((MISSING_DEPENDENCIES++))
 		echo -n -e "\n   $package... "
-		#if [[ $package == "oracle-java6-installer" ]]; then
-		#	sudo apt-get -y install $package
-		#fi
+		if [[ $package == "oracle-java6-installer" ]]; then      
+			sudo add-apt-repository -y ppa:webupd8team/java 2>/dev/null 1>/dev/null
+			sudo apt-get -y update 2>/dev/null 1>/dev/null
+			sudo apt-get -y install $package
+		fi
 		sudo apt-get -y install $package 2>/dev/null 1>/dev/null
 		
 		if ! dpkg -s "$package" 2>/dev/null | grep -q -i "install ok installed"; then
@@ -77,10 +82,12 @@ sudo ln -s /usr/lib/i386-linux-gnu/mesa/libGL.so.1 /usr/lib/i386-linux-gnu/libGL
 
 # Configure Git
 
+echo
+echo
 scripts/config_git
 if [ $? == 0 ]; then ((MISSING_DEPENDENCIES++)); fi
 
-if [ $ERROR_DEPENDENCIES -eq 0 ] && [ $MISSING_DEPENDENCIES -gt 0 ]; then
+if [ $ERROR_DEPENDENCIES == 0 ] && [ $MISSING_DEPENDENCIES -gt 0 ]; then
 	echo -e "\n\n The installation of dependencies was successful."
 elif [ $MISSING_DEPENDENCIES -eq 0 ]; then
 	echo -e "${COLOR_Yellow} ALREADY INSTALLED${COLOR_Wipe}"
