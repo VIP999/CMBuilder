@@ -9,7 +9,7 @@ F_PleaseWait
 echo -e -n "\n Install the correct ${COLOR_Yellow}java${COLOR_Wipe} version ? [Recommended]
 	(Y)es, (N)o: "
 
-read -p "" choice
+read choice
 
 case $choice in	
 	[Yy]* ) 
