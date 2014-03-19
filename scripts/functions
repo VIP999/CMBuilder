@@ -13,7 +13,7 @@ COLOR_Cyan='\e[1;36m'
 # Check SU
 F_CheckSU() {
 	if [ $EUID -ne 0 ]; then
-		echo "\n This script must be run as root"
+		echo -e "\n This script must be run as root"
 		exit 1
 	fi
 }
