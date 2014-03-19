@@ -60,5 +60,22 @@ else
 	echo -e "${COLOR_Red}NO${COLOR_Wipe}"
 fi
 
+
+# Git
+GIT_Configured=1
+
+echo -n -e " Git configured: "
+git config --list | grep -q -i "user.name="
+if [ ! $? == 0 ]; then GIT_Configured=0; fi
+
+git config --list | grep -q -i "user.email="
+if [ ! $? == 0 ]; then GIT_Configured=0; fi
+
+if [ $GIT_Configured == 1 ]; then
+	echo -e "${COLOR_Green}YES${COLOR_Wipe}"
+else
+	echo -e "${COLOR_Red}NO${COLOR_Wipe}"
+fi
+
 echo
 F_PressEnter
