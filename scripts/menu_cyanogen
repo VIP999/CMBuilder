@@ -29,9 +29,8 @@ do
 	echo "    2) Change branch"
 	echo "    3) Change device"
 	echo
-	echo "    4) View git config"
-	echo "    5) Sync sources"
-	echo "    6) Build repo"
+	echo "    4) Sync sources"
+	echo "    5) Build repo"
 	echo 
 	echo "    e) Return to main menu"
 	echo
@@ -50,10 +49,7 @@ do
 		3 ) scripts/change_device
 			;;
 			
-		4 ) scripts/view_git_config
-			;;
-			
-		5 ) scripts/sync_cm_sources
+		4 ) scripts/sync_cm_sources
 			;;
 			
 		5 ) scripts/build_cm_sources

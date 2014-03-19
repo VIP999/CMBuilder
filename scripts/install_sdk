@@ -64,15 +64,6 @@ fi
 
 # SDK Platform Tools
 
-SDKPTOOLS_ZIPNAME=$(grep -i platform-tools_r sdktools.html | grep -i linux | awk -F'>' '{print $2}' | awk -F'<' '{print $1}' | awk 'END {print}')
-SDKPTOOLS_LINK="http://dl-ssl.google.com/android/repository/$SDKPTOOLS_ZIPNAME"
-rm sdktools.html 2>/dev/null
-
-
-F_Download $SDKPTOOLS_ZIPNAME $SDKPTOOLS_LINK platform-tools
-
-# Extract SDK Platform Tools
-
 PLATFORM_TOOLS="android-tools-adb android-tools-fastboot"
 
 for package in $PLATFORM_TOOLS
