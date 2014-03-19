@@ -1,3 +1,27 @@
 #!/bin/bash
 . scripts/functions
 clear
+
+REPO_Path=$(sed -n "3 p" scripts/config_tool)
+CM_Branch=$(sed -n "2 p" scripts/config_tool)
+
+echo
+if [ -d $REPO_Path ] && [[ ! $REPO_Path == '' ]]; then
+	cd $REPO_Path
+	echo -n " Initializing repo... "
+	
+	~/bin/repo init -u git://github.com/CyanogenMod/android.git -b $CM_Branch 2>/dev/null 1>/dev/null
+	if [ $? == 0 ]; then
+		echo -e "${COLOR_Green}SUCCESS${COLOR_Wipe}"
+	else
+		echo -e "${COLOR_Red}ERROR${COLOR_Wipe}\n"
+		echo -e " Error while init repo, can't continue\n"
+		F_PressEnter
+		exit
+	fi
+	
+	F_PressEnter
+else
+	echo -e "${COLOR_Red}ERROR${COLOR_Wipe}: Repo path does not exist, please change it before sync sources.\n"
+	F_PressEnter
+fi
