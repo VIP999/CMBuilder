@@ -16,7 +16,7 @@ if [ ! -d $PATH_Old ]; then
 			mkdir $PATH_Old 2>/dev/null
 			if [ -d $PATH_Old ]; then
 				chmod 777 $PATH_Old
-				echo -e "\n\n SUCCESS: ${COLOR_Green}$PATH${COLOR_Wipe}_Old was created"
+				echo -e "\n\n SUCCESS: ${COLOR_Green}$PATH_Old${COLOR_Wipe} was created"
 			else
 				echo -e "\n\n ${COLOR_Red}ERROR${COLOR_Wipe}: Can't create folder $PATH_Old"
 			fi
@@ -39,7 +39,16 @@ if [[ $REPO_Path == "" ]]; then
 	exit 1
 fi
 
-if [[ ! $PATH_Old == $REPO_Path ]] && [[ ! $REPO_Path == "scripts" ]]; then
+if [[ ! $PATH_Old == $REPO_Path ]] && [[ ! $REPO_Path == "scripts" ]] && [[ ! $REPO_Path == '~' ]] && [[ ! $REPO_Path == '~/' ]]; then
+	
+	# Workaround for make "~/"
+	
+	echo $REPO_Path|grep -q -i '~/'
+	if [ $? == 0 ]; then
+		HOME_PATH=~
+		REPO_Path=$(echo $HOME_PATH${REPO_Path:1}); fi
+	fi
+	
 	if [ -d $REPO_Path ]; then
 		echo -e "\n Changed from ${COLOR_Cyan}$PATH_Old${COLOR_Wipe} to ${COLOR_Cyan}$REPO_Path${COLOR_Wipe}"
 		sed -i "3c$REPO_Path" scripts/config_tool
@@ -50,9 +59,9 @@ if [[ ! $PATH_Old == $REPO_Path ]] && [[ ! $REPO_Path == "scripts" ]]; then
 		
 		case $choice in
 			[Yy]* )
-				mkdir $REPO_Path 2>/dev/null
+				mkdir "$REPO_Path"
 				if [ -d $REPO_Path ]; then
-					chmod 777 $REPO_Path
+					chmod 777 "$REPO_Path"
 					echo -e "\n Changed from ${COLOR_Cyan}$PATH_Old${COLOR_Wipe} to ${COLOR_Cyan}$REPO_Path${COLOR_Wipe}"
 					sed -i "3c$REPO_Path" scripts/config_tool
 				else
@@ -69,8 +78,10 @@ if [[ ! $PATH_Old == $REPO_Path ]] && [[ ! $REPO_Path == "scripts" ]]; then
 		F_PressEnter
 		exit 0
 	fi
-else
-	echo -e " Nothing to change."
+elif [[ $PATH_Old == $REPO_Path ]]; then
+	echo -e "\n ${COLOR_Yellow}INFORMATION${COLOR_Wipe}: Nothing to change."
+else 
+	echo -e "\n ${COLOR_Red}ERROR${COLOR_Wipe}: Cannot change repo path for ${COLOR_Cyan}$REPO_Path${COLOR_Wipe} "
 fi
 
 echo
